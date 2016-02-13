@@ -6,30 +6,18 @@
 #include "wheelencoder.h"
 #include "hcsr04.h"
 #include "qre1113.h"
-#include "stm32f3_discovery_gyroscope.h"
+#include "stm32f3xx_hal.h"
+#include "stm32f3_discovery.h"
 
 #include "stdio.h"
 
 const uint32_t LOOPTIME = 3;   // 10ms loop cycle
-const uint32_t TURNDISTANCE = 25; // Turn if distance below this value (cm)
-const uint32_t SLOWDISTANCE = 40; // Slow if distance below this value (cm)
-const uint32_t MINENCODERSPEED = 8000;  // Max time between encoder pulses to considered stopped
 
 uint32_t SLOWSPEED = 840; // Speed in slow mode
 uint32_t ULTRASLOWSPEED = 750;
 uint32_t FULLSPEED = 880; // Speed in fast mode
 const uint32_t MINSPEED = 700;  // Min allowed speed
 const uint32_t MAXSPEED = 1000; // Max allowed speed
-
-
-//const uint32_t LINETHREASHOLD = 150;
-
-
-
-// 0 = white
-// 1 = black
-
-
 
 typedef enum
 {
@@ -52,6 +40,9 @@ typedef enum
   ROTATE,
   FORWARD,
 }runMode;
+
+// 0 = white
+// 1 = black
 
 int directions[] = 
 {
@@ -76,8 +67,6 @@ int directions[] =
 void robotControl_init(void)
 {
   drv8701_init();   // motor driver
-  hcsr04_init(0);   // ultra sonic sensor 1
-  hcsr04_init(1);   // ultra sonic sensor 2
   wheelencoder_init();  // wheel encoder
   qre1113_init();   // line sensor
   
@@ -95,11 +84,9 @@ void robotControl_init(void)
 
 void robotControl_run(void)
 {  
-  uint32_t distanceLeft;
-  uint32_t distanceRight;
   uint32_t wheelSpeed;
   uint32_t wheelSpeed2;
-  float gyroResponse[3];
+
   
   uint32_t leftSpeed;
   uint32_t rightSpeed;
@@ -120,13 +107,12 @@ void robotControl_run(void)
   volatile double integratedDiff;
   
   uint32_t lineValue;
- 
   
   while(1)
   {
     // Read sensor data
-    distanceLeft = hcsr04_getDistance(0);
-    distanceRight = hcsr04_getDistance(1);
+/*    distanceLeft = hcsr04_getDistance(0);
+    distanceRight = hcsr04_getDistance(1);*/
     wheelSpeed = wheelencoder_getSpeed(0);
     wheelSpeed2 = wheelencoder_getSpeed(1);
     lineSensor = qre1113_getValue(0) > threashold; // left
@@ -176,28 +162,7 @@ void robotControl_run(void)
     
 //     printf("%u %u %u %u\n", lineSensor, lineSensor2, lineSensor3, lineSensor4);
     
-    // Use gyro to adjust motor speed to drive straight
-    
-//      BSP_GYRO_GetXYZ(gyroResponse);
-//      if(gyroResponse[2] > 0)
-//      {
-//        rightSpeed+=5;
-//      }
-//      else
-//      {
-//        rightSpeed-=5;
-//      }
-//    
-//    // Check that speed is within limits
-//    if(rightSpeed < MINSPEED)
-//    {
-//      rightSpeed = MINSPEED;
-//    }
-//    
-//    if(rightSpeed > MAXSPEED)
-//    {
-//      rightSpeed = MAXSPEED;
-//    }
+
     
     
 //    diff = (1.0f/wheelSpeed2) - (1.0f/wheelSpeed);
@@ -299,176 +264,7 @@ void robotControl_run(void)
       break;
       
     };
-    
-    
-//    switch(mode)
-//    {
-//    case STOP:
-//      drv8701_setspeed(0, 0, DRV8701_STOP);
-//      break;
-//
-//    case START:
-//      leftSpeed = FULLSPEED;
-//      rightSpeed = FULLSPEED;
-//      drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_FORWARD);
-//      mode = NORMAL;
-//      break;
-//        
-//    case NORMAL:
-//       if(lineSensor3 > threashold)
-//       {
-//          mode = SEARCH_CCW;
-//          searchTime = 500;
-//          drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_STOP);
-//       }
-//       else 
-//       if(lineSensor > threashold)
-//       {
-//          mode = SEARCH_CW;
-//          searchTime = 500;
-//          drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_STOP);
-//       }
-//       else
-//       {
-//        drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_FORWARD);
-//       }
-//      break;
-//      
-//    case SEARCH_CW:
-//      // try cw
-//      for(int i = 0; (i < searchTime) && (mode == SEARCH_CW); i++)
-//      {
-//        drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
-//
-//        lineSensor = qre1113_getValue(0);
-//        if(lineSensor < threashold)
-//        {
-//          mode = START;
-//        }
-//        HAL_Delay(1);
-//      }
-//      break;
-//        
-//    case SEARCH_CCW:
-//        // try ccw
-//      for(int i = 0; (i < searchTime) && (mode == SEARCH_CCW); i++)
-//      {
-//        drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CCW);
-//      
-//        lineSensor3 = qre1113_getValue(2);
-//        if(lineSensor3 < threashold)
-//        {
-//          mode = START;
-//        }
-//        HAL_Delay(1);
-//      }
-//      break;
-//    };
-                
-//    switch(mode)
-//    {
-//    case STOP:
-//      drv8701_setspeed(0, 0, DRV8701_STOP);
-//      break;
-//      
-//      // Start with full speed, during normal state speed is controlled to go straight
-//    case START:
-//      leftSpeed = FULLSPEED;
-//      rightSpeed = FULLSPEED;
-//      drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_FORWARD);
-//      mode = NORMAL;
-//      break;
-//      
-//    case NORMAL:
-//      if((distanceLeft < SLOWDISTANCE) || (distanceRight < SLOWDISTANCE))
-//      {
-//        rightSpeed = SLOWSPEED;
-//        leftSpeed = SLOWSPEED;
-//        
-//        mode = SLOW;
-//      }
-//      
-//      // If going too slow, try to back off
-//      if(wheelSpeed > MINENCODERSPEED)
-//      {
-//        mode = BACKOFF;
-//      }
-//      
-//      drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_FORWARD);
-//      
-//      BSP_LED_Off(LED6);
-//      break;
-//      
-//    case SLOW:
-//      if((distanceLeft > SLOWDISTANCE) && (distanceRight > SLOWDISTANCE))
-//      {
-//        mode = START;
-//      }
-//      
-//      if(distanceLeft < TURNDISTANCE)
-//      {
-//        mode = TURN_CW;
-//      }
-//      
-//      if(distanceRight < TURNDISTANCE)
-//      {
-//        mode = TURN_CCW;
-//      }
-//      
-//      // If going to slow, try to back off
-//      if(wheelSpeed > MINENCODERSPEED)
-//      {
-//        mode = BACKOFF;
-//      }
-//      
-//      drv8701_setspeed(leftSpeed, rightSpeed, DRV8701_FORWARD);
-//      
-//      BSP_LED_On(LED6);
-//      break;
-//      
-//    case TURN_CW:
-//      drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_TURN_CW);
-//      HAL_Delay(300);     
-//      drv8701_setspeed(0, 0, DRV8701_STOP);
-//      HAL_Delay(200);     
-//      
-//      distanceLeft = hcsr04_getDistance(0);
-//      distanceRight = hcsr04_getDistance(1);
-//      
-//      // If no obstacle, go to normal
-//      if(distanceLeft > TURNDISTANCE && distanceRight > TURNDISTANCE)
-//      {
-//        mode = START;
-//      }
-//      break;
-//      
-//    case TURN_CCW:
-//      drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_TURN_CCW);
-//      HAL_Delay(300);     
-//      drv8701_setspeed(0, 0, DRV8701_STOP);
-//      HAL_Delay(200);     
-//      
-//      // If no obstacle, go to normal
-//      distanceLeft = hcsr04_getDistance(0);
-//      distanceRight = hcsr04_getDistance(1);
-//      
-//      // We don't go to normal because we then risk to go to TURN_CW and we will just go and forth
-//      if(distanceLeft > TURNDISTANCE && distanceRight > TURNDISTANCE)
-//      {
-//        mode = START;
-//      }
-//      break;
-//      
-//    case BACKOFF:
-//      drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_BACKWARD);
-//      HAL_Delay(500);
-//      drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_TURN_CW);
-//      HAL_Delay(500);
-//      
-//      mode = START;
-//      break;
-//    }
-    
+
     HAL_Delay(LOOPTIME);
   }
 }
