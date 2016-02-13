@@ -148,7 +148,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   HAL_NVIC_SetPriority(TIM1_BRK_TIM15_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(TIM1_BRK_TIM15_IRQn);
   
-  /* D.9 is used to trigger ultra sound sensor */
+  /* D.9 is used to trigger ultra sonic sensor */
   GPIO_InitStruct.Pin = GPIO_PIN_9;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
@@ -156,7 +156,7 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   GPIO_InitStruct.Alternate = 0;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /* PC.13 is used to trigger ultra sound sensor */
+  /* PC.13 is used to trigger ultra sonic sensor */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
