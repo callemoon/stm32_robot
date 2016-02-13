@@ -6,21 +6,17 @@
 #include "hcsr04.h"
 #include "stm32f3xx_hal.h"
 
-#define BOOL int
-#define TRUE 1
-#define FALSE 0
-
 #define INSTANCES   2
 
 static TIM_HandleTypeDef    TimHandle[INSTANCES];
 static uint32_t distance[INSTANCES] = {0, 0};
 static uint32_t startTime[INSTANCES] = {0, 0};
-static BOOL measurementComplete[INSTANCES] = {FALSE, FALSE};
+static uint8_t measurementComplete[INSTANCES] = {0, 0};
 
 static const uint32_t PERIOD = 60000; // 60 ms max measurement time, this includes time from tigger to response from sensor
 static const uint32_t PRESCALER = 72; // 1Mhz timer, 1us resolution
 
-static const uint32_t MAXDISTANCE = 65535;  // If we get a measurment timeout we set this distance
+static const uint32_t MAXDISTANCE = 65535;  // If we get a measurement timeout we set this distance
 
 static uint32_t timeouts[INSTANCES] = {0,0};
 
@@ -89,7 +85,7 @@ void hcsr04_init(uint32_t instance)
   HAL_TIM_Base_Start_IT(&TimHandle[instance]);    
 }
 
-// This function does not do any measurment, only returns last measurement
+// This function does not do any measurement, only returns last measurement
 // Returns distance in centimeter
 uint32_t hcsr04_getDistance(uint32_t instance)
 {
@@ -117,12 +113,14 @@ void TIM8_UP_IRQHandler(void)
         timeouts[0]++;
       }
         
+      volatile int i;
+
       // Trigger a new measurement
       HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_SET);
-//      for(volatile int i = 0; i < 100; i++);
+      for(i = 0; i < 100; i++);
       HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
       
-      measurementComplete[0] = FALSE;
+      measurementComplete[0] = 0;
     }
   }    
 }
@@ -141,12 +139,14 @@ void TIM1_BRK_TIM15_IRQHandler(void)
         timeouts[1]++;
       }
       
-//      // Trigger a new measurement
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-//      for(volatile int i = 0; i < 100; i++);
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+      volatile int i;
+
+      // Trigger a new measurement
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+      for(i = 0; i < 100; i++);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
       
-      measurementComplete[1] = FALSE;
+      measurementComplete[1] = 0;
     }
   }    
   
@@ -164,7 +164,7 @@ void TIM1_BRK_TIM15_IRQHandler(void)
       else  // falling edge, measure time diff to first pulse
       {      
         distance[1] = HAL_TIM_ReadCapturedValue(&TimHandle[1], TIM_CHANNEL_2) - startTime[1];
-        measurementComplete[1] = TRUE;
+        measurementComplete[1] = 1;
       }
     }
   }
@@ -186,7 +186,7 @@ void TIM8_CC_IRQHandler(void)
       else  // falling edge, measure time diff to first pulse
       {      
         distance[0] = HAL_TIM_ReadCapturedValue(&TimHandle[0], TIM_CHANNEL_1) - startTime[0];
-        measurementComplete[0] = TRUE;
+        measurementComplete[0] = 1;
       }
     }
   }
