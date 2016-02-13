@@ -12,13 +12,14 @@ static TIM_HandleTypeDef    TimHandle;
 static TIM_HandleTypeDef    TimHandle2;
 
 
-static uint32_t encoderSpeed = 0;
-static uint32_t encoderSpeed2 = 0;
+#define NUM_ENCODERS 2
+
+static uint32_t encoderSpeed[NUM_ENCODERS] = {0,0};
 
 static int on1 = 0;
 static int on2 = 0;
 
-static const uint32_t PERIOD = 10000;   // 100us*10000 = 1000ms max measruement time
+static const uint32_t PERIOD = 10000;   // 100us*10000 = 1000ms max measurement time
 static const uint32_t PRESCALER = 7200; // 100us steps
 
 static void Error_Handler(void)
@@ -65,7 +66,6 @@ void wheelencoder_init(void)
   
   HAL_TIM_Base_Start_IT(&TimHandle);
 
-//  TIM_IC_InitTypeDef     sICConfig;
   TimHandle2.Instance = TIM1;
   
   TimHandle2.Init.Period        = PERIOD - 1;
@@ -99,14 +99,11 @@ void wheelencoder_init(void)
   HAL_TIM_Base_Start_IT(&TimHandle2);
 }
 
-uint32_t wheelencoder_getSpeed(void)
+uint32_t wheelencoder_getSpeed(uint8_t encoder)
 {
-  return encoderSpeed;
-}
+//  assert(encoder < NUM_ENCODERS);
 
-uint32_t wheelencoder_getSpeed2(void)
-{
-  return encoderSpeed2;
+  return encoderSpeed[encoder];
 }
 
 void TIM1_TRG_COM_TIM17_IRQHandler(void);
@@ -122,7 +119,7 @@ void TIM1_CC_IRQHandler(void)
       {
         __HAL_TIM_CLEAR_IT(&TimHandle2, TIM_IT_CC2);
         
-        encoderSpeed2 = HAL_TIM_ReadCapturedValue(&TimHandle2, TIM_CHANNEL_2);
+        encoderSpeed[1] = HAL_TIM_ReadCapturedValue(&TimHandle2, TIM_CHANNEL_2);
         
         TIM1->CNT = 0;
         
@@ -150,7 +147,7 @@ void TIM1_UP_TIM16_IRQHandler(void)
     { 
       __HAL_TIM_CLEAR_IT(&TimHandle2, TIM_IT_UPDATE);
 
-      encoderSpeed2 = PERIOD;    // If timer expires we have got no pulse during measurment period, set max time
+      encoderSpeed[1] = PERIOD;    // If timer expires we have got no pulse during measurment period, set max time
     }
   }
 }
@@ -166,7 +163,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
       {
         __HAL_TIM_CLEAR_IT(&TimHandle, TIM_IT_CC1);
         
-        encoderSpeed = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
+        encoderSpeed[0] = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
         
         TIM17->CNT = 0;
         
@@ -191,7 +188,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
     { 
       __HAL_TIM_CLEAR_IT(&TimHandle, TIM_IT_UPDATE);
 
-      encoderSpeed = PERIOD;    // If timer expires we have got no pulse during measurment period, set max time
+      encoderSpeed[0] = PERIOD;    // If timer expires we have got no pulse during measurment period, set max time
     }
   }
 }

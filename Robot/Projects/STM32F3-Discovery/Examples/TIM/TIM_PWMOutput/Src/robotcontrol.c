@@ -127,8 +127,8 @@ void robotControl_run(void)
     // Read sensor data
     distanceLeft = hcsr04_getDistance(0);
     distanceRight = hcsr04_getDistance(1);
-    wheelSpeed = wheelencoder_getSpeed();    
-    wheelSpeed2 = wheelencoder_getSpeed2();    
+    wheelSpeed = wheelencoder_getSpeed(0);
+    wheelSpeed2 = wheelencoder_getSpeed(1);
     lineSensor = qre1113_getValue(0) > threashold; // left
     lineSensor2 = qre1113_getValue(1) > threashold;
     lineSensor3 = qre1113_getValue(2) > threashold;  // right
