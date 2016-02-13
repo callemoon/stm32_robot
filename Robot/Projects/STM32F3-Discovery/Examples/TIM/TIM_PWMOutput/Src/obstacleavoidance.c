@@ -35,6 +35,8 @@ void obstacleAvoidance_init(void)
   hcsr04_init(1);     // ultra sonic sensor 2
   wheelencoder_init();// wheel encoder
 
+  BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);   // push button
+
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED9);
   BSP_LED_Init(LED6);
@@ -58,6 +60,16 @@ void obstacleAvoidance_run(void)
     distanceRight = hcsr04_getDistance(1);
     wheelSpeedLeft = wheelencoder_getSpeed(0);
     wheelSpeedRight = wheelencoder_getSpeed(1);
+
+    if (BSP_PB_GetState(BUTTON_USER))
+    {
+      if (mode == STOP)
+      {
+        mode = START;
+      }
+
+      HAL_Delay(500);
+    }
 
     if(distanceLeft < SLOWDISTANCE)
     {
