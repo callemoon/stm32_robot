@@ -125,6 +125,30 @@ void TIM8_UP_IRQHandler(void)
   }    
 }
 
+
+// Interrupt handler for timer 8 capture compare
+void TIM8_CC_IRQHandler(void)
+{
+  if(__HAL_TIM_GET_FLAG(&TimHandle[0], TIM_FLAG_CC1) != RESET)
+  {
+    if(__HAL_TIM_GET_ITSTATUS(&TimHandle[0], TIM_IT_CC1) !=RESET)
+    {
+      __HAL_TIM_CLEAR_IT(&TimHandle[0], TIM_IT_CC1);
+
+      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6))   // Rising edge
+      {
+        startTime[0] = HAL_TIM_ReadCapturedValue(&TimHandle[0], TIM_CHANNEL_1);
+      }
+      else  // falling edge, measure time diff to first pulse
+      {
+        distance[0] = HAL_TIM_ReadCapturedValue(&TimHandle[0], TIM_CHANNEL_1) - startTime[0];
+        measurementComplete[0] = 1;
+      }
+    }
+  }
+}
+
+// Interrupt handler for timer 1 capture compare and update
 void TIM1_BRK_TIM15_IRQHandler(void)
 {
   if(__HAL_TIM_GET_FLAG(&TimHandle[1], TIM_FLAG_UPDATE) != RESET)
@@ -170,24 +194,3 @@ void TIM1_BRK_TIM15_IRQHandler(void)
   }
 }
 
-// Interrupt handler for timer 8 capture compare
-void TIM8_CC_IRQHandler(void)
-{
-  if(__HAL_TIM_GET_FLAG(&TimHandle[0], TIM_FLAG_CC1) != RESET)
-  {
-    if(__HAL_TIM_GET_ITSTATUS(&TimHandle[0], TIM_IT_CC1) !=RESET)
-    {
-      __HAL_TIM_CLEAR_IT(&TimHandle[0], TIM_IT_CC1);
-      
-      if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6))   // Rising edge
-      {
-        startTime[0] = HAL_TIM_ReadCapturedValue(&TimHandle[0], TIM_CHANNEL_1);
-      }
-      else  // falling edge, measure time diff to first pulse
-      {      
-        distance[0] = HAL_TIM_ReadCapturedValue(&TimHandle[0], TIM_CHANNEL_1) - startTime[0];
-        measurementComplete[0] = 1;
-      }
-    }
-  }
-}
