@@ -137,6 +137,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Src/system_stm32f3xx.c</locationURI>
 		</link>
 		<link>
+			<name>Drivers/STM32F3xx_HAL_Driver/Src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Drivers/STM32F3xx_HAL_Driver/stm32f3xx_hal.c</name>
 			<type>1</type>
 			<locationURI>PARENT-7-PROJECT_LOC/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal.c</locationURI>
@@ -232,6 +237,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/startup_stm32f303xc.s</locationURI>
 		</link>
 		<link>
+			<name>Example/User/STM32F3-Discovery</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Example/User/drv8701.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/drv8701.c</locationURI>
@@ -255,6 +265,16 @@
 			<name>Example/User/main.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/main.c</locationURI>
+		</link>
+		<link>
+			<name>Example/User/obstacleavoidance.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/obstacleavoidance.c</locationURI>
+		</link>
+		<link>
+			<name>Example/User/obstacleavoidance.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/obstacleavoidance.h</locationURI>
 		</link>
 		<link>
 			<name>Example/User/qre1113.c</name>
@@ -297,9 +317,44 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Src/wheelencoder.h</locationURI>
 		</link>
 		<link>
+			<name>Drivers/BSP/Components/l3gd20</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Drivers/BSP/STM32F3-Discovery/stm32f3_discovery.c</name>
 			<type>1</type>
 			<locationURI>PARENT-7-PROJECT_LOC/Drivers/BSP/STM32F3-Discovery/stm32f3_discovery.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi_ex.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_spi_ex.c</locationURI>
+		</link>
+		<link>
+			<name>Example/User/STM32F3-Discovery/stm32f3_discovery_gyroscope.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/BSP/STM32F3-Discovery/stm32f3_discovery_gyroscope.c</locationURI>
+		</link>
+		<link>
+			<name>Example/User/STM32F3-Discovery/stm32f3_discovery_gyroscope.h</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/BSP/STM32F3-Discovery/stm32f3_discovery_gyroscope.h</locationURI>
+		</link>
+		<link>
+			<name>Drivers/BSP/Components/l3gd20/l3gd20.c</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/BSP/Components/l3gd20/l3gd20.c</locationURI>
+		</link>
+		<link>
+			<name>Drivers/BSP/Components/l3gd20/l3gd20.h</name>
+			<type>1</type>
+			<locationURI>PARENT-7-PROJECT_LOC/Drivers/BSP/Components/l3gd20/l3gd20.h</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

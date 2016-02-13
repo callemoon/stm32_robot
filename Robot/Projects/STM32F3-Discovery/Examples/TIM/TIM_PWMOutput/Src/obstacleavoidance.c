@@ -17,7 +17,7 @@ typedef enum
   BACKOFF
 }runMode;
 
-static const uint32_t LOOPTIME_MS = 3;  // loop time
+static const uint32_t LOOPTIME_MS = 10;  // loop time
 
 static const uint32_t MINSPEED = 700;
 static const uint32_t MAXSPEED = 900;
@@ -40,6 +40,8 @@ void obstacleAvoidance_init(void)
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED9);
   BSP_LED_Init(LED6);
+
+  BSP_GYRO_Init();
 }
 
 void obstacleAvoidance_run(void)
@@ -182,7 +184,7 @@ void obstacleAvoidance_run(void)
       distanceRight = hcsr04_getDistance(1);
 
       // If no obstacle, go to normal
-      if (distanceLeft > TURNDISTANCE && distanceRight > TURNDISTANCE)
+      if ((distanceLeft > TURNDISTANCE) && (distanceRight > TURNDISTANCE))
       {
         mode = START;
       }
