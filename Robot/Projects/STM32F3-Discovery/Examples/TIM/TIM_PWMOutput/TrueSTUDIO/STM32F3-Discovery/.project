@@ -242,6 +242,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>Example/User/Src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>Example/User/drv8701.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/drv8701.c</locationURI>
@@ -260,6 +265,16 @@
 			<name>Example/User/hcsr04.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/hcsr04.h</locationURI>
+		</link>
+		<link>
+			<name>Example/User/linefollower.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/linefollower.c</locationURI>
+		</link>
+		<link>
+			<name>Example/User/linefollower.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Src/linefollower.h</locationURI>
 		</link>
 		<link>
 			<name>Example/User/main.c</name>
@@ -285,16 +300,6 @@
 			<name>Example/User/qre1113.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Src/qre1113.h</locationURI>
-		</link>
-		<link>
-			<name>Example/User/robotcontrol.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/robotcontrol.c</locationURI>
-		</link>
-		<link>
-			<name>Example/User/robotcontrol.h</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/Src/robotcontrol.h</locationURI>
 		</link>
 		<link>
 			<name>Example/User/stm32f3xx_hal_msp.c</name>
