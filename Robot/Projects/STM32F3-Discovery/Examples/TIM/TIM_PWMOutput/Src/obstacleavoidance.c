@@ -30,6 +30,7 @@ static const uint32_t SLOWDISTANCE = 40; // Slow if distance below this value (c
 
 void obstacleAvoidance_init(void)
 {
+  drv8701_init();     // motor driver
   hcsr04_init(0);     // ultra sonic sensor 1
   hcsr04_init(1);     // ultra sonic sensor 2
   wheelencoder_init();// wheel encoder
@@ -49,7 +50,7 @@ void obstacleAvoidance_run(void)
   uint32_t wheelSpeedLeft = 0;
   uint32_t wheelSpeedRight = 0;
 
-  runMode mode = START;
+  runMode mode = STOP;
 
   while (1)
   {
@@ -67,7 +68,7 @@ void obstacleAvoidance_run(void)
       BSP_LED_Off(LED5);
     }
 
-    if(distanceLeft < SLOWDISTANCE)
+    if(distanceRight < SLOWDISTANCE)
     {
       BSP_LED_On(LED9);
     }

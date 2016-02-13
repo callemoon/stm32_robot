@@ -84,9 +84,6 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   __TIM17_CLK_ENABLE();
   __TIM15_CLK_ENABLE();
   
-
-
-  
   __ADC34_CLK_ENABLE();
   __ADC2_CLK_ENABLE();
   
@@ -98,7 +95,6 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   __GPIOF_CLK_ENABLE();
   
   __DMA2_CLK_ENABLE();
-    
 
 //  RCC_PeriphCLKInitTypeDef PeriphClkInit;
 //  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC34;

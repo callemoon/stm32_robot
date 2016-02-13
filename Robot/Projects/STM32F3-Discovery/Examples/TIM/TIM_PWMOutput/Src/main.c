@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include "stm32f3_discovery_gyroscope.h"
 #include "robotcontrol.h"
-  
+#include "obstacleavoidance.h"
 
 /** @addtogroup STM32F3xx_HAL_Examples
   * @{
@@ -106,7 +106,8 @@ int main(void)
   calibration[1] = (calibration0[1] + calibration1[1] + calibration2[1]) / 3;
   calibration[2] = (calibration0[2] + calibration1[2] + calibration2[2]) / 3;*/
   
-  robotControl_init();
+//  robotControl_init();
+  obstacleAvoidance_init();
   
 //  while(1)
 //  {  
@@ -116,7 +117,8 @@ int main(void)
 //      HAL_Delay(250);
 //  }
   
-  robotControl_run();
+  obstacleAvoidance_run();
+  //robotControl_run();
 
   return 0;
 }
