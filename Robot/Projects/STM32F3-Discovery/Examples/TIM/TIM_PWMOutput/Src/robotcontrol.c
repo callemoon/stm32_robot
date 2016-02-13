@@ -122,7 +122,7 @@ void robotControl_run(void)
     
     lineValue = lineSensor + (lineSensor2<<1) + (lineSensor3<<2) + (lineSensor4 <<3);
     
-    // Indicate if obstacle is ahead
+    // Indicate if line is detected at a certain sensor
     if(lineSensor)
     {
       BSP_LED_On(LED3);

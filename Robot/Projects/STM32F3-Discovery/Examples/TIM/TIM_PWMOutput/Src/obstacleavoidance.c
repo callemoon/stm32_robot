@@ -34,13 +34,9 @@ void obstacleAvoidance_init(void)
   hcsr04_init(1);     // ultra sonic sensor 2
   wheelencoder_init();// wheel encoder
 
-  BSP_LED_Init(LED3);
-  BSP_LED_Init(LED6);
-  BSP_LED_Init(LED4);
-  BSP_LED_Init(LED8);
   BSP_LED_Init(LED5);
-  BSP_LED_Init(LED10);
   BSP_LED_Init(LED9);
+  BSP_LED_Init(LED6);
 }
 
 void obstacleAvoidance_run(void)
@@ -48,17 +44,37 @@ void obstacleAvoidance_run(void)
   uint32_t distanceLeft;
   uint32_t distanceRight;
   float gyroResponse[3];
-  uint32_t leftSpeed;
-  uint32_t rightSpeed;
-  uint32_t wheelSpeed;
+  uint32_t leftSpeed = 0;
+  uint32_t rightSpeed = 0;
+  uint32_t wheelSpeedLeft = 0;
+  uint32_t wheelSpeedRight = 0;
 
-  runMode mode;
+  runMode mode = START;
 
   while (1)
   {
     distanceLeft = hcsr04_getDistance(0);
     distanceRight = hcsr04_getDistance(1);
-    wheelSpeed = wheelencoder_getSpeed(0);
+    wheelSpeedLeft = wheelencoder_getSpeed(0);
+    wheelSpeedRight = wheelencoder_getSpeed(1);
+
+    if(distanceLeft < SLOWDISTANCE)
+    {
+      BSP_LED_On(LED5);
+    }
+    else
+    {
+      BSP_LED_Off(LED5);
+    }
+
+    if(distanceLeft < SLOWDISTANCE)
+    {
+      BSP_LED_On(LED9);
+    }
+    else
+    {
+      BSP_LED_Off(LED9);
+    }
 
     // Use gyro to adjust motor speed to drive straight
     BSP_GYRO_GetXYZ(gyroResponse);
@@ -106,7 +122,7 @@ void obstacleAvoidance_run(void)
       }
 
       // If going too slow, try to back off
-      if (wheelSpeed > MINENCODERSPEED)
+      if ((wheelSpeedRight > MINENCODERSPEED) || (wheelSpeedLeft > MINENCODERSPEED))
       {
         mode = BACKOFF;
       }
@@ -122,16 +138,18 @@ void obstacleAvoidance_run(void)
         mode = START;
       }
 
-      if (distanceLeft < TURNDISTANCE) {
+      if (distanceLeft < TURNDISTANCE)
+      {
         mode = TURN_CW;
       }
 
-      if (distanceRight < TURNDISTANCE) {
+      if (distanceRight < TURNDISTANCE)
+      {
         mode = TURN_CCW;
       }
 
-      // If going to slow, try to back off
-      if (wheelSpeed > MINENCODERSPEED)
+      // If going too slow, try to back off
+      if ((wheelSpeedRight > MINENCODERSPEED) || (wheelSpeedLeft > MINENCODERSPEED))
       {
         mode = BACKOFF;
       }
@@ -168,7 +186,7 @@ void obstacleAvoidance_run(void)
       distanceRight = hcsr04_getDistance(1);
 
       // We don't go to normal because we then risk to go to TURN_CW and we will just go and forth
-      if (distanceLeft > TURNDISTANCE && distanceRight > TURNDISTANCE)
+      if ((distanceLeft > TURNDISTANCE) && (distanceRight > TURNDISTANCE))
       {
         mode = START;
       }
