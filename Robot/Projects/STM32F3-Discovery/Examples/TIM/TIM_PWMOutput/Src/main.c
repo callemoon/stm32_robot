@@ -69,8 +69,6 @@ static void Error_Handler(void);
   * @retval None
   */
 
-float calibration[3];    
-
 int main(void)
 {
 
@@ -89,36 +87,11 @@ int main(void)
   
   /* Configure the system clock to have a system clock = 72 Mhz */
   SystemClock_Config();
-
-/*  float calibration0[3];
-  float calibration1[3];
-  float calibration2[3];
-  
-  BSP_GYRO_Init();
-  BSP_GYRO_GetXYZ(calibration0);
-  HAL_Delay(5);
-  BSP_GYRO_GetXYZ(calibration1);
-  HAL_Delay(5);
-  BSP_GYRO_GetXYZ(calibration2);
-  HAL_Delay(5);*/
-  
-/*  calibration[0] = (calibration0[0] + calibration1[0] + calibration2[0]) / 3;
-  calibration[1] = (calibration0[1] + calibration1[1] + calibration2[1]) / 3;
-  calibration[2] = (calibration0[2] + calibration1[2] + calibration2[2]) / 3;*/
   
 //  robotControl_init();
   obstacleAvoidance_init();
-  
-//  while(1)
-//  {  
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-//      HAL_Delay(250);
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-//      HAL_Delay(250);
-//  }
-  
-  obstacleAvoidance_run();
   //robotControl_run();
+  obstacleAvoidance_run();
 
   return 0;
 }
