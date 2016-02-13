@@ -1,22 +1,20 @@
 // Driver for QRE1113 line following sensor
-// Beeing close to a bright surface returns a low number
-
+// Being close to a bright surface returns a low number
 
 #include "stm32f3xx_hal.h"
-
 #include "qre1113.h"
 
 ADC_HandleTypeDef hadc1;
 static ADC_HandleTypeDef hadc2;
 
-uint32_t dmabuffer[3];
+uint32_t adc_dmabuffer[3];
 
 void qre1113_init(void)
 {
   ADC_ChannelConfTypeDef sConfig;
 
-    /**Common config 
-    */
+  /**Common config
+   */
   hadc1.Instance = ADC3;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1;
   hadc1.Init.Resolution = ADC_RESOLUTION12b;
@@ -32,8 +30,8 @@ void qre1113_init(void)
   hadc1.Init.Overrun = OVR_DATA_OVERWRITTEN;
   HAL_ADC_Init(&hadc1);
 
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel
+   */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = 1;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
@@ -57,9 +55,8 @@ void qre1113_init(void)
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
   sConfig.Offset = 0;
   HAL_ADC_ConfigChannel(&hadc1, &sConfig);
-  
-//  HAL_ADC_Start(&hadc1); 
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)dmabuffer, 6); 
+
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_dmabuffer, 6);
 
   hadc2.Instance = ADC2;
   hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1;
@@ -76,8 +73,8 @@ void qre1113_init(void)
   hadc2.Init.Overrun = OVR_DATA_OVERWRITTEN;
   HAL_ADC_Init(&hadc2);
 
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel
+   */
   sConfig.Channel = ADC_CHANNEL_11;
   sConfig.Rank = 1;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
@@ -94,19 +91,19 @@ uint32_t qre1113_getValue(uint8_t sensor)
   switch(sensor)
   {
   case 0:      
-  return HAL_ADC_GetValue(&hadc2);
-  break;
-  
+    return HAL_ADC_GetValue(&hadc2);
+    break;
+
   case 1:
-    return dmabuffer[0];
+    return adc_dmabuffer[0];
     break;
-    
+
   case 2:
-    return dmabuffer[1];
+    return adc_dmabuffer[1];
     break;
-    
+
   case 3:
-    return dmabuffer[2];
+    return adc_dmabuffer[2];
     break;
   }
 }
