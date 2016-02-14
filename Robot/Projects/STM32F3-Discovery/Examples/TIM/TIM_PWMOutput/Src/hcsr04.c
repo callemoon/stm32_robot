@@ -1,5 +1,5 @@
 // Driver for the hcsr04 ultra sonic distance sensor
-// Uses timer 8 in capture mode to measure length of pulse which equals distance to obstacle
+// Uses timer 8 and timer 15 in capture mode to measure length of pulse which equals distance to obstacle
 // Seems like hcsr04 sometimes lock up for a while and does not give a falling edge, in that case the measurment will time out and we will
 // measure maximum distance
 
@@ -51,8 +51,13 @@ void hcsr04_init(uint32_t instance)
    // /* Initialization Error */
     Error_Handler();
   }
-  HAL_TIM_Base_Init(&TimHandle[instance]);
   
+  if(HAL_TIM_Base_Init(&TimHandle[instance]) != HAL_OK);
+  {
+   // /* Initialization Error */
+    Error_Handler();
+  }
+
   /*##-2- Configure the Input Capture channel ################################*/ 
   /* Configure the Input Capture of channel 2 */
   sICConfig.ICPolarity  = TIM_ICPOLARITY_BOTHEDGE;  // We want interrupt on both rising and falling edge and measures the time diff between the two
@@ -82,7 +87,11 @@ void hcsr04_init(uint32_t instance)
     Error_Handler();
   }
   
-  HAL_TIM_Base_Start_IT(&TimHandle[instance]);    
+  if(HAL_TIM_Base_Start_IT(&TimHandle[instance]) != HAL_OK);
+  {
+    /* Starting Error */
+    Error_Handler();
+  }
 }
 
 // This function does not do any measurement, only returns last measurement

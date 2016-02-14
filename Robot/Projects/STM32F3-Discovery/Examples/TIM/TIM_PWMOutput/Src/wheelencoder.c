@@ -1,6 +1,6 @@
 // Driver for optical wheel encoder
 // Make sure to use a schmitt trigger between processor and photo diode to get distinct pulses
-// Uses timer 17 in capture compare mode to measure time between pulses
+// Uses timer 17 and timer 1 in capture compare mode to measure time between pulses
 // Uses max filter of capture channel to avoid jitter
 
 #include "stm32f3xx_hal.h"
