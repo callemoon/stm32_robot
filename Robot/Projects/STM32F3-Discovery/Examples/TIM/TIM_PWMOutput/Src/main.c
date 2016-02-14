@@ -39,7 +39,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdio.h>
-#include "stm32f3_discovery_gyroscope.h"
 #include "linefollower.h"
 #include "obstacleavoidance.h"
 
@@ -51,7 +50,13 @@
   * @{
   */
 
+typedef enum
+{
+  MODE_LINEFOLLOWING,
+  MODE_OBSTACLEAVOIDANCE
+}robotModes;
 
+const static robotModes robotMode = MODE_LINEFOLLOWING;
 
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -83,15 +88,25 @@ int main(void)
        - Low Level Initialization
      */
   HAL_Init();
-
   
   /* Configure the system clock to have a system clock = 72 Mhz */
   SystemClock_Config();
   
-  linefollower_init();
-  //obstacleAvoidance_init();
-  linefollower_run();
-  //obstacleAvoidance_run();
+  switch(robotMode)
+  {
+  case MODE_OBSTACLEAVOIDANCE:
+    obstacleAvoidance_init();
+    obstacleAvoidance_run();
+    break;
+
+  case MODE_LINEFOLLOWING:
+    linefollower_init();
+    linefollower_run();
+    break;
+
+  default:
+    break;
+  }
 
   return 0;
 }
