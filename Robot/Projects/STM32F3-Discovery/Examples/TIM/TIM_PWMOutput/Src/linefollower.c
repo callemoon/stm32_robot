@@ -89,13 +89,14 @@ void linefollower_run(void)
   {
     uint8_t i;
 
+    lineValue = 0;
+
     // Read sensor data
     for(i = 0; i < LINESENSORS; i++)
     {
       lineSensor[i] = (qre1113_getValue(i) > threashold);
+      lineValue += (lineSensor[i] << i);
     }
-
-    lineValue = lineSensor[0] + (lineSensor[1]<<1) + (lineSensor[2]<<2) + (lineSensor[3] <<3);
 
     // Indicate if line is detected at a certain sensor
     if(lineSensor[0])
@@ -181,12 +182,12 @@ void linefollower_run(void)
         break;
 
       case SLOWRIGHT:
-        //          printf("left\n");
+        //          printf("slowleft\n");
         drv8701_setspeed(FULLSPEED, SLOWSPEED, DRV8701_FORWARD);
         break;
 
       case SLOWLEFT:
-        //          printf("right\n");
+        //          printf("slowright\n");
         drv8701_setspeed(SLOWSPEED, FULLSPEED, DRV8701_FORWARD);
         break;
 
@@ -199,7 +200,7 @@ void linefollower_run(void)
         //          printf("rotate\n");
         drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
         break;
-      };
+      }
     }
     else
     {

@@ -88,22 +88,26 @@ void qre1113_init(void)
 
 uint32_t qre1113_getValue(uint8_t sensor)
 { 
+  uint32_t value = 0;
+
   switch(sensor)
   {
   case 0:      
-    return HAL_ADC_GetValue(&hadc2);
+    value = HAL_ADC_GetValue(&hadc2);
     break;
 
   case 1:
-    return adc_dmabuffer[0];
+    value = adc_dmabuffer[0];
     break;
 
   case 2:
-    return adc_dmabuffer[1];
+    value = adc_dmabuffer[1];
     break;
 
   case 3:
-    return adc_dmabuffer[2];
+    value = adc_dmabuffer[2];
     break;
   }
+
+  return value;
 }
