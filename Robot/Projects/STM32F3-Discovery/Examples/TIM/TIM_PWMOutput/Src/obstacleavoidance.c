@@ -1,3 +1,5 @@
+// Obstacle avoidance algorithm
+
 #include "obstacleavoidance.h"
 #include "stm32f3_discovery_gyroscope.h"
 

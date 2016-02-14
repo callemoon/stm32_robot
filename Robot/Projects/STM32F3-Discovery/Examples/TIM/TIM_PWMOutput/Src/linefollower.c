@@ -1,9 +1,8 @@
-// Main of robot control
+// Line following algorithm
 
 #include "linefollower.h"
 
 #include "drv8701.h"
-#include "wheelencoder.h"
 #include "hcsr04.h"
 #include "qre1113.h"
 #include "stm32f3xx_hal.h"
@@ -11,28 +10,20 @@
 
 #include "stdio.h"
 
-const uint32_t LOOPTIME = 3;   // 10ms loop cycle
+const uint32_t LOOPTIME_MS = 3;   // loop time
 
 const uint32_t SLOWSPEED = 840; // Speed in slow mode
-const uint32_t ULTRASLOWSPEED = 750;
-uint32_t FULLSPEED = 880; // Speed in fast mode
-const uint32_t MINSPEED = 700;  // Min allowed speed
-const uint32_t MAXSPEED = 1000; // Max allowed speed
+const uint32_t ULTRASLOWSPEED = 750;  // Speed in ultra slow mode
+const uint32_t FULLSPEED = 880; // Speed in fast mode
+
+const uint32_t LINESENSORS = 4; // Number of line sensors available
 
 typedef enum
 {
   STOP,
-  START,
   NORMAL,
-  SLOW,
-  TURN_CW,
-  TURN_CCW,
-  BACKOFF,
-  SEARCH,
   BLACKLEVEL,
   WHITELEVEL,
-  SEARCH_CW,
-  SEARCH_CCW,
   LEFT,
   RIGHT,
   SLOWLEFT,
@@ -44,7 +35,7 @@ typedef enum
 // 0 = white
 // 1 = black
 
-int directions[] = 
+runMode directions[] =
 {
   ROTATE,   // 0000
   RIGHT,     // 0001
@@ -67,7 +58,6 @@ int directions[] =
 void robotControl_init(void)
 {
   drv8701_init();   // motor driver
-//  wheelencoder_init();  // wheel encoder
   qre1113_init();   // line sensor
   
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);   // push button
@@ -84,33 +74,30 @@ void robotControl_init(void)
 
 void robotControl_run(void)
 {  
-  uint32_t rightSpeed;
-  
-  uint32_t lineSensor;
-  uint32_t lineSensor2;
-  uint32_t lineSensor3;
-  uint32_t lineSensor4;
-  
+  uint32_t lineSensor[LINESENSORS];
+
   runMode mode = STOP;
-  
-  uint32_t blackLevel;
-  uint32_t whiteLevel;
+
+  uint32_t blackLevel = 0;
+  uint32_t whiteLevel = 0;
   uint32_t threashold = 300;
-  
+
   uint32_t lineValue;
-  
+
   while(1)
   {
+    uint8_t i;
+
     // Read sensor data
-    lineSensor = qre1113_getValue(0) > threashold; // left
-    lineSensor2 = qre1113_getValue(1) > threashold;
-    lineSensor3 = qre1113_getValue(2) > threashold;  // right
-    lineSensor4 = qre1113_getValue(3) > threashold;  // right
-    
-    lineValue = lineSensor + (lineSensor2<<1) + (lineSensor3<<2) + (lineSensor4 <<3);
-    
+    for(i = 0; i < LINESENSORS; i++)
+    {
+      lineSensor[i] = (qre1113_getValue(i) > threashold);
+    }
+
+    lineValue = lineSensor[0] + (lineSensor[1]<<1) + (lineSensor[2]<<2) + (lineSensor[3] <<3);
+
     // Indicate if line is detected at a certain sensor
-    if(lineSensor)
+    if(lineSensor[0])
     {
       BSP_LED_On(LED3);
     }
@@ -118,8 +105,8 @@ void robotControl_run(void)
     {
       BSP_LED_Off(LED3);
     }
-    
-    if(lineSensor2)
+
+    if(lineSensor[1])
     {
       BSP_LED_On(LED5);
     }
@@ -127,8 +114,8 @@ void robotControl_run(void)
     {
       BSP_LED_Off(LED5);
     }
-    
-    if(lineSensor3)
+
+    if(lineSensor[2])
     {
       BSP_LED_On(LED9);      
     }
@@ -137,7 +124,7 @@ void robotControl_run(void)
       BSP_LED_Off(LED9);      
     }
 
-    if(lineSensor4)
+    if(lineSensor[3])
     {
       BSP_LED_On(LED10);      
     }
@@ -146,93 +133,82 @@ void robotControl_run(void)
       BSP_LED_Off(LED10);      
     }
 
-    if(rightSpeed < MINSPEED)
-    {
-      rightSpeed = MINSPEED;
-    }
-    
-    if(rightSpeed > MAXSPEED)
-    {
-      rightSpeed = MAXSPEED;
-    }
-    
-    
     // Check user button
-    if(BSP_PB_GetState(BUTTON_USER))
+    if (BSP_PB_GetState(BUTTON_USER))
     {
-      if(mode == BLACKLEVEL)
+      switch (mode)
       {
-        blackLevel = qre1113_getValue(0);
-        
-        threashold = (blackLevel + whiteLevel) / 2;
-        
-        mode = START;
-      }
-
-      if(mode == STOP)
-      {
+      case STOP:
         whiteLevel = qre1113_getValue(0);
-        
+
         mode = BLACKLEVEL;
-      }
-      
-      if(mode == NORMAL)
-      {
-        FULLSPEED+=10;
-        
-        if(FULLSPEED > 1000)
-        {
-          mode = STOP;
-          drv8701_setspeed(0, 0, DRV8701_STOP);
-          FULLSPEED = 750;
-        }
-      }
-      
+        break;
+
+      case BLACKLEVEL:
+        blackLevel = qre1113_getValue(0);
+
+        threashold = (blackLevel + whiteLevel) / 2;
+
+        mode = NORMAL;
+        break;
+
+      default:
+        break;
+      };
       // Debounce
       HAL_Delay(500);
     }
-    
-    
-    switch(directions[lineValue])
+
+    if(mode == NORMAL)
     {
-    case FORWARD:
-//          printf("forward\n");
-          drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_FORWARD);
-      break;
-      
-    case RIGHT:
-//          printf("left\n");
-          drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CCW);
-      break;
-      
-    case LEFT:
-//          printf("right\n");
-          drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
-      break;
+      switch(directions[lineValue])
+      {
+      case FORWARD:
+        //          printf("forward\n");
+        drv8701_setspeed(FULLSPEED, FULLSPEED, DRV8701_FORWARD);
+        break;
 
-    case SLOWRIGHT:
-//          printf("left\n");
-          drv8701_setspeed(FULLSPEED, SLOWSPEED, DRV8701_FORWARD);
-      break;
-      
-    case SLOWLEFT:
-//          printf("right\n");
-          drv8701_setspeed(SLOWSPEED, FULLSPEED, DRV8701_FORWARD);
-      break;
-      
-    case STOP:
-//          printf("stop\n");
-          drv8701_setspeed(0, 0, DRV8701_STOP);
-      break;
-      
-    case ROTATE:
-//          printf("rotate\n");
-          drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
-      break;
-      
-    };
+      case RIGHT:
+        //          printf("left\n");
+        drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CCW);
+        break;
 
-    HAL_Delay(LOOPTIME);
+      case LEFT:
+        //          printf("right\n");
+        drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
+        break;
+
+      case SLOWRIGHT:
+        //          printf("left\n");
+        drv8701_setspeed(FULLSPEED, SLOWSPEED, DRV8701_FORWARD);
+        break;
+
+      case SLOWLEFT:
+        //          printf("right\n");
+        drv8701_setspeed(SLOWSPEED, FULLSPEED, DRV8701_FORWARD);
+        break;
+
+      case BLACKLEVEL:
+      case WHITELEVEL:
+      case NORMAL:
+      case STOP:
+        //          printf("stop\n");
+        drv8701_setspeed(0, 0, DRV8701_STOP);
+        break;
+
+      case ROTATE:
+        //          printf("rotate\n");
+        drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
+        break;
+
+      };
+    }
+    else
+    {
+      drv8701_setspeed(0, 0, DRV8701_STOP);
+    }
+
+    HAL_Delay(LOOPTIME_MS);
   }
 }
 
