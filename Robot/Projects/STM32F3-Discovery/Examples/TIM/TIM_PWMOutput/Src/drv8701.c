@@ -3,9 +3,7 @@
 // Drive the motors with 18Khz PWM to keep noise down and avoid to much switching loss
 
 #include "drv8701.h"
-
 #include "stm32f3xx_hal.h"
-#include "drv8701.h"
 
 const uint32_t PERIOD = 1000;   // 18Mhz/1000 = 18Khz
 const uint32_t PRESCALER = 4;   // 72/4 = 18 Mhz

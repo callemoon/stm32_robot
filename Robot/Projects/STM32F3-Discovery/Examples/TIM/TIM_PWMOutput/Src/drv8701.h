@@ -1,7 +1,7 @@
 #ifndef DRV8701
 #define DRV8701
 
-#include "stm32f3xx_hal.h"
+#include "stdint.h"
 
 typedef enum
 {
