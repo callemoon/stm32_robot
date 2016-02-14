@@ -64,7 +64,11 @@ void wheelencoder_init(void)
     Error_Handler();
   }
   
-  HAL_TIM_Base_Start_IT(&TimHandle);
+  if(HAL_TIM_Base_Start_IT(&TimHandle) != HAL_OK)
+  {
+    /* Starting Error */
+    Error_Handler();
+  }
 
   TimHandle2.Instance = TIM1;
   
@@ -96,7 +100,11 @@ void wheelencoder_init(void)
     Error_Handler();
   }
   
-  HAL_TIM_Base_Start_IT(&TimHandle2);
+  if(HAL_TIM_Base_Start_IT(&TimHandle2) != HAL_OK)
+  {
+    /* Starting Error */
+    Error_Handler();
+  }
 }
 
 uint32_t wheelencoder_getSpeed(uint8_t encoder)
