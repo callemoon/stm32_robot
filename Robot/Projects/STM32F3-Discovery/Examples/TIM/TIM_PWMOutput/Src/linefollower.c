@@ -13,8 +13,8 @@
 
 const uint32_t LOOPTIME = 3;   // 10ms loop cycle
 
-uint32_t SLOWSPEED = 840; // Speed in slow mode
-uint32_t ULTRASLOWSPEED = 750;
+const uint32_t SLOWSPEED = 840; // Speed in slow mode
+const uint32_t ULTRASLOWSPEED = 750;
 uint32_t FULLSPEED = 880; // Speed in fast mode
 const uint32_t MINSPEED = 700;  // Min allowed speed
 const uint32_t MAXSPEED = 1000; // Max allowed speed
@@ -67,7 +67,7 @@ int directions[] =
 void robotControl_init(void)
 {
   drv8701_init();   // motor driver
-  wheelencoder_init();  // wheel encoder
+//  wheelencoder_init();  // wheel encoder
   qre1113_init();   // line sensor
   
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);   // push button
@@ -84,11 +84,6 @@ void robotControl_init(void)
 
 void robotControl_run(void)
 {  
-  uint32_t wheelSpeed;
-  uint32_t wheelSpeed2;
-
-  
-  uint32_t leftSpeed;
   uint32_t rightSpeed;
   
   uint32_t lineSensor;
@@ -100,21 +95,13 @@ void robotControl_run(void)
   
   uint32_t blackLevel;
   uint32_t whiteLevel;
-  uint32_t threashold;
-  uint32_t searchTime;
-
-  volatile double diff;
-  volatile double integratedDiff;
+  uint32_t threashold = 300;
   
   uint32_t lineValue;
   
   while(1)
   {
     // Read sensor data
-/*    distanceLeft = hcsr04_getDistance(0);
-    distanceRight = hcsr04_getDistance(1);*/
-    wheelSpeed = wheelencoder_getSpeed(0);
-    wheelSpeed2 = wheelencoder_getSpeed(1);
     lineSensor = qre1113_getValue(0) > threashold; // left
     lineSensor2 = qre1113_getValue(1) > threashold;
     lineSensor3 = qre1113_getValue(2) > threashold;  // right
@@ -158,26 +145,6 @@ void robotControl_run(void)
     {
       BSP_LED_Off(LED10);      
     }
-
-    
-//     printf("%u %u %u %u\n", lineSensor, lineSensor2, lineSensor3, lineSensor4);
-    
-
-    
-    
-//    diff = (1.0f/wheelSpeed2) - (1.0f/wheelSpeed);
-//    integratedDiff += diff;
-//    
-//    rightSpeed = (integratedDiff * 50000) + (diff * 100000);
-    
-//    if(wheelSpeed < wheelSpeed2)
-//    {
-//      rightSpeed-=1;
-//    }
-//    else
-//    {
-//      rightSpeed+=1;      
-//    }
 
     if(rightSpeed < MINSPEED)
     {
