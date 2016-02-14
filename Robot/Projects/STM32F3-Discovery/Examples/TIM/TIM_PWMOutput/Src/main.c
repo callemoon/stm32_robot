@@ -88,9 +88,9 @@ int main(void)
   /* Configure the system clock to have a system clock = 72 Mhz */
   SystemClock_Config();
   
-  robotControl_init();
+  linefollower_init();
   //obstacleAvoidance_init();
-  robotControl_run();
+  linefollower_run();
   //obstacleAvoidance_run();
 
   return 0;

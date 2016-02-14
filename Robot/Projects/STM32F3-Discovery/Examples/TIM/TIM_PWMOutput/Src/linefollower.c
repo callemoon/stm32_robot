@@ -5,9 +5,9 @@
 #include "drv8701.h"
 #include "hcsr04.h"
 #include "qre1113.h"
+
 #include "stm32f3xx_hal.h"
 #include "stm32f3_discovery.h"
-
 #include "stdio.h"
 
 const uint32_t LOOPTIME_MS = 3;   // loop time
@@ -20,22 +20,27 @@ const uint32_t LINESENSORS = 4; // Number of line sensors available
 
 typedef enum
 {
-  STOP,
   NORMAL,
-  BLACKLEVEL,
-  WHITELEVEL,
+  CALIBRATE_BLACKLEVEL,
+  CALIBRATE_WHITELEVEL
+}runMode;
+
+typedef enum
+{
+  STOP,
   LEFT,
   RIGHT,
   SLOWLEFT,
   SLOWRIGHT,
   ROTATE,
-  FORWARD,
-}runMode;
+  FORWARD
+}direction;
 
 // 0 = white
 // 1 = black
 
-runMode directions[] =
+// direction of robot for all possible combinations of line sensor values
+direction directions[] =
 {
   ROTATE,   // 0000
   RIGHT,     // 0001
@@ -55,28 +60,24 @@ runMode directions[] =
   STOP     // 1111
 }; 
 
-void robotControl_init(void)
+void linefollower_init(void)
 {
   drv8701_init();   // motor driver
   qre1113_init();   // line sensor
   
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);   // push button
 
-  /* Configure LED3 */
   BSP_LED_Init(LED3);
-  BSP_LED_Init(LED6);
-  BSP_LED_Init(LED4);
-  BSP_LED_Init(LED8);
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED10);
   BSP_LED_Init(LED9);  
 }
 
-void robotControl_run(void)
+void linefollower_run(void)
 {  
   uint32_t lineSensor[LINESENSORS];
 
-  runMode mode = STOP;
+  runMode mode = CALIBRATE_WHITELEVEL;
 
   uint32_t blackLevel = 0;
   uint32_t whiteLevel = 0;
@@ -138,13 +139,13 @@ void robotControl_run(void)
     {
       switch (mode)
       {
-      case STOP:
+      case CALIBRATE_WHITELEVEL:
         whiteLevel = qre1113_getValue(0);
 
-        mode = BLACKLEVEL;
+        mode = CALIBRATE_BLACKLEVEL;
         break;
 
-      case BLACKLEVEL:
+      case CALIBRATE_BLACKLEVEL:
         blackLevel = qre1113_getValue(0);
 
         threashold = (blackLevel + whiteLevel) / 2;
@@ -154,7 +155,8 @@ void robotControl_run(void)
 
       default:
         break;
-      };
+      }
+
       // Debounce
       HAL_Delay(500);
     }
@@ -188,9 +190,6 @@ void robotControl_run(void)
         drv8701_setspeed(SLOWSPEED, FULLSPEED, DRV8701_FORWARD);
         break;
 
-      case BLACKLEVEL:
-      case WHITELEVEL:
-      case NORMAL:
       case STOP:
         //          printf("stop\n");
         drv8701_setspeed(0, 0, DRV8701_STOP);
@@ -200,7 +199,6 @@ void robotControl_run(void)
         //          printf("rotate\n");
         drv8701_setspeed(SLOWSPEED, SLOWSPEED, DRV8701_TURN_CW);
         break;
-
       };
     }
     else

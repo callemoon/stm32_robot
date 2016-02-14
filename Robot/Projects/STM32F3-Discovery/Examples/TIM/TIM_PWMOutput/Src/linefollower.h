@@ -1,7 +1,7 @@
 #ifndef LINEFOLLOWER
 #define LINEFOLLOWER
 
-void robotControl_init(void);
-void robotControl_run(void);
+void linefollower_init(void);
+void linefollower_run(void);
 
 #endif
