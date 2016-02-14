@@ -67,6 +67,8 @@ void linefollower_init(void)
   
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);   // push button
 
+  HAL_Delay(100); // Short delay to avoid false readings
+
   BSP_LED_Init(LED3);
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED10);
