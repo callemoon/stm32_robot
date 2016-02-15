@@ -4,20 +4,15 @@
 // Uses max filter of capture channel to avoid jitter
 
 #include "stm32f3xx_hal.h"
-#include "stm32f3_discovery.h"
 
 #include "wheelencoder.h"
 
 static TIM_HandleTypeDef    TimHandle;
 static TIM_HandleTypeDef    TimHandle2;
 
-
 #define NUM_ENCODERS 2
 
 static uint32_t encoderSpeed[NUM_ENCODERS] = {0,0};
-
-static int on1 = 0;
-static int on2 = 0;
 
 static const uint32_t PERIOD = 10000;   // 100us*10000 = 1000ms max measurement time
 static const uint32_t PRESCALER = 7200; // 100us steps
@@ -118,6 +113,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM1_CC_IRQHandler(void);
 void TIM1_UP_TIM16_IRQHandler(void);
 
+// Timer 1 capture compare interrupt
 void TIM1_CC_IRQHandler(void)
 {
   if(__HAL_TIM_GET_FLAG(&TimHandle2, TIM_FLAG_CC2) != RESET)
@@ -130,23 +126,12 @@ void TIM1_CC_IRQHandler(void)
         encoderSpeed[1] = HAL_TIM_ReadCapturedValue(&TimHandle2, TIM_CHANNEL_2);
         
         TIM1->CNT = 0;
-        
-        // Toggle led to show speed
-        on2 = !on2;
-        
-//        if(on2)
-//        {
-//          BSP_LED_On(LED10);
-//        }
-//        else
-//        {
-//          BSP_LED_Off(LED10);
-//        }
       }
     }
   }
 }
 
+// Timer 1 Update interrupt
 void TIM1_UP_TIM16_IRQHandler(void)
 {
   if(__HAL_TIM_GET_FLAG(&TimHandle2, TIM_FLAG_UPDATE) != RESET)
@@ -161,7 +146,7 @@ void TIM1_UP_TIM16_IRQHandler(void)
 }
 
 
-// interrupt handler
+// Timer 17 update and capture compare interrupt
 void TIM1_TRG_COM_TIM17_IRQHandler(void)
 {
   if(__HAL_TIM_GET_FLAG(&TimHandle, TIM_FLAG_CC1) != RESET)
@@ -174,18 +159,6 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)
         encoderSpeed[0] = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
         
         TIM17->CNT = 0;
-        
-        // Toggle led to show speed
-        on1 = !on1;
-        
-//        if(on1)
-//        {
-//          BSP_LED_On(LED3);
-//        }
-//        else
-//        {
-//          BSP_LED_Off(LED3);
-//        }
       }
     }
   }
